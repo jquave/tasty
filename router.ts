@@ -49,8 +49,9 @@ export class Router {
         console.log("Serving up some tasty routes")
         for await (const req of this.serve_instance) {
             let matched = false;
-            
-            let requested = new Route(req.url, null)
+            //split the requested url on ? and remove all empty spaces resulting from several ?s
+            const request = req.url.split("?").filter((word: string) => word.length > 0)
+            let requested = new Route(request[0], null)
             // Only match against routes with the same number of segments
             let routsWithSameCountOfSegments = this.routes.filter((route) => {
                 return route.path_segments.length === requested.path_segments.length
@@ -113,12 +114,20 @@ export class Router {
                 // selectedRoute.describe_handler();
 
                 // So, this is actually the number of args in the callback, but if there's a mismatch from the params in the URL, then they just need to fix that at their call site
-                let numParams = selectedRoute.handler.length - 1;
-                if(numParams == 0) {
+                let numParams = selectedRoute.handler.length;
+                if(numParams == 1) {
                     selectedRoute.handler(req);
                 }
                 else {
                     let argsMap: Map<string, string> = new Map();
+                    let urlParams;
+                    try { // exception handling for malformed URL
+                        urlParams = new URLSearchParams(request[1]);
+                    } catch {
+                        console.log(`Bad request ${request[1]}`);
+                        req.respond({ body: `400 Bad Request` });
+                        continue;
+                    }
                     // let args: any[] = []
                     // Find the indices of the slugs
                     let routeSlugs: string[] = []
@@ -138,7 +147,7 @@ export class Router {
                         console.log(`set ${argKey} to ${argVal}`)
                         argsMap.set(argKey, argVal);
                     }
-                    selectedRoute.handler(req, argsMap);
+                    selectedRoute.handler(req, argsMap,urlParams);
                 }
             }
             if(!matched) {
@@ -154,7 +163,12 @@ export class Router {
     handle404default(req: ServerRequest) {
         req.respond({ body: `404 Not Found` })
     }
-    on(route: string, handler: (req: ServerRequest, query: Map<string, string>) => void)  {
+    on(route: string, 
+        handler: (
+            req: ServerRequest,
+            query: Map<string, string>,
+            params: URLSearchParams
+        ) => void)  {
         let newRoute = new Route(route, handler);
         this.routes.push(newRoute)
     }
