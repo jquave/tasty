@@ -113,9 +113,7 @@ export class Router {
                 matched = true
                 // selectedRoute.describe_handler();
 
-                // So, this is actually the number of args in the callback, but if there's a mismatch from the params in the URL, then they just need to fix that at their call site
-                let numParams = selectedRoute.handler.length;
-                if(numParams == 1) {
+                if(selectedRoute.handler.length == 1) {
                     selectedRoute.handler(req);
                 }
                 else {
@@ -128,7 +126,6 @@ export class Router {
                         req.respond({ body: `400 Bad Request` });
                         continue;
                     }
-                    // let args: any[] = []
                     // Find the indices of the slugs
                     let routeSlugs: string[] = []
                     let slugIndices: number[] = []
@@ -140,7 +137,7 @@ export class Router {
                             slugIndices.push(i);
                         }
                     }
-                    for(var i = 0; i <= numParams; i++) {
+                    for(var i = 0; i <= routeSlugs.length; i++) {
                         // args.push(requested.path_segments[slugIndices[i]])
                         let argKey = routeSlugs[i]
                         let argVal = requested.path_segments[slugIndices[i]]

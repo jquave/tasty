@@ -58,6 +58,16 @@ test("Test that slug logic works as expected", async function (): Promise<void> 
             req.respond({body: `${params.get("a")}`,});
         }
     );
+    
+    router.on('/1/:2/:3/:4/:5', (req, query) => {
+        req.respond({ body: `1${query.get('2')}${query.get('3')}${query.get('4')}${query.get('5')}` })
+    });
+    assertEquals(await (await fetch("http://localhost:8000/1/v2/v3/v4/v5")).text(), "1v2v3v4v5")
+    router.on('/1/2/3/4/5/:6', (req, query) => {
+        req.respond({ body: `12345${query.get('6')}` })
+    });
+    assertEquals(await (await fetch("http://localhost:8000/1/2/3/4/5/v6")).text(), "12345v6")
+
     assertEquals(await (await fetch("http://localhost:8000/reversed/args/e1/f1")).text(), "e1 f1")
     assertEquals(await (await fetch("http://localhost:8000/ae/")).text(), "/a")
     assertEquals(await (await fetch("http://localhost:8000/ae/651")).text(), "/a2/651")
