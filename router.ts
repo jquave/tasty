@@ -18,9 +18,7 @@ export class Route {
                 if (c === "/") {
                     if (currPathSegment.length < 1) {
                         // checks if this route was made by server or during a request loop
-                        if (handler) {
-                            throw `Invalid path ${path}. Each path segment should be seperated by exactly one slash /`;
-                        }
+                        throw `Invalid path ${path}. Each path segment should be seperated by exactly one slash /`;
                     }
                     else {
                         this.path_segments.push(currPathSegment);
