@@ -8,15 +8,15 @@ export class Route {
     constructor(path: string, handler: any) {
         this.path = path
         this.handler = handler
-        if(path[0] !== '/') {
+        if (path[0] !== '/') {
             throw `Invalid path ${path}. Paths should begin with a slash /`;
         }
         let currPathSegment = "";
-        for(var i = 0; i < path.length; i++) {
-            if(i > 0) {
+        for (var i = 0; i < path.length; i++) {
+            if (i > 0) {
                 let c = path[i];
-                if(c === "/") {
-                    if(currPathSegment.length < 1) {
+                if (c === "/") {
+                    if (currPathSegment.length < 1) {
                         throw `Invalid path ${path}. Each path segment should be seperated by exactly one slash /`;
                     }
                     else {
@@ -29,7 +29,7 @@ export class Route {
                 }
             }
         }
-        if(currPathSegment.length > 0) {
+        if (currPathSegment.length > 0) {
             this.path_segments.push(currPathSegment);
             currPathSegment = "";
         }
@@ -49,7 +49,7 @@ export class Router {
         console.log("Serving up some tasty routes")
         for await (const req of this.serve_instance) {
             let matched = false;
-            
+
             let requested = new Route(req.url, null)
             // Only match against routes with the same number of segments
             let routsWithSameCountOfSegments = this.routes.filter((route) => {
@@ -57,29 +57,29 @@ export class Router {
             })
             // Further filter my routes with exact matches or potential matches from slugs
             let possibleRoutes: Route[] = []
-            for(let rdx in routsWithSameCountOfSegments) {
+            for (let rdx in routsWithSameCountOfSegments) {
                 let route = routsWithSameCountOfSegments[rdx];
                 let routeDisqualified = false
                 let wildcard_count = 0;
                 let first_wildcard = -1;
-                for(var segment_idx = 0; segment_idx <  route.path_segments.length; segment_idx++) {
+                for (var segment_idx = 0; segment_idx < route.path_segments.length; segment_idx++) {
                     let route_segment = route.path_segments[segment_idx];
-                    if(route_segment[0] == ":") {
+                    if (route_segment[0] == ":") {
                         // This is a slug/wildcard so we can't filter it yet
-                        if(wildcard_count == 0) {
+                        if (wildcard_count == 0) {
                             first_wildcard = segment_idx
                         }
                         wildcard_count++
                     }
                     else {
-                        if(route_segment != requested.path_segments[segment_idx]) {
+                        if (route_segment != requested.path_segments[segment_idx]) {
                             // Non-matching route
                             routeDisqualified = true
                             break
                         }
                     }
                 }
-                if(!routeDisqualified) {
+                if (!routeDisqualified) {
                     possibleRoutes.push(route)
                 }
             }
@@ -87,13 +87,13 @@ export class Router {
             // and either exact matches or wildcards.
             // TODO: Sort on route insert, rather than on query
             let possibleRoutesSorted = possibleRoutes.sort((a, b) => {
-                for(var i=0;i<a.path_segments.length;i++) {
+                for (var i = 0; i < a.path_segments.length; i++) {
                     let psa = a.path_segments[i];
                     let psb = b.path_segments[i];
                     let a_is_wild = psa[0] === ":"
                     let b_is_wild = psb[0] === ":"
                     if (a_is_wild != b_is_wild) {
-                        if(a_is_wild) {
+                        if (a_is_wild) {
                             // b is the better choice bc it is more specific
                             return 1
                         }
@@ -107,14 +107,14 @@ export class Router {
                 return 0
             })
             console.log(`  ####  ${requested.path}  ####  `)
-            if(possibleRoutesSorted.length > 0) {
+            if (possibleRoutesSorted.length > 0) {
                 let selectedRoute = possibleRoutesSorted[0];
                 matched = true
                 // selectedRoute.describe_handler();
 
                 // So, this is actually the number of args in the callback, but if there's a mismatch from the params in the URL, then they just need to fix that at their call site
                 let numParams = selectedRoute.handler.length - 1;
-                if(numParams == 0) {
+                if (numParams == 0) {
                     selectedRoute.handler(req);
                 }
                 else {
@@ -123,15 +123,15 @@ export class Router {
                     // Find the indices of the slugs
                     let routeSlugs: string[] = []
                     let slugIndices: number[] = []
-                    for(var i = 0; i < selectedRoute.path_segments.length; i++) {
+                    for (var i = 0; i < selectedRoute.path_segments.length; i++) {
                         let path = selectedRoute.path_segments[i];
-                        if(path[0] === ":") {
+                        if (path[0] === ":") {
                             const sslug = path.substring(1, path.length);
                             routeSlugs.push(sslug);
                             slugIndices.push(i);
                         }
                     }
-                    for(var i = 0; i <= numParams; i++) {
+                    for (var i = 0; i <= numParams; i++) {
                         // args.push(requested.path_segments[slugIndices[i]])
                         let argKey = routeSlugs[i]
                         let argVal = requested.path_segments[slugIndices[i]]
@@ -141,7 +141,7 @@ export class Router {
                     selectedRoute.handler(req, argsMap);
                 }
             }
-            if(!matched) {
+            if (!matched) {
                 // Handle 404 when no match occurs
                 console.log(`404: ${req.url}`)
                 this.handle404(req)
@@ -154,7 +154,7 @@ export class Router {
     handle404default(req: ServerRequest) {
         req.respond({ body: `404 Not Found` })
     }
-    on(route: string, handler: (req: ServerRequest, query: Map<string, string>) => void)  {
+    on(route: string, handler: (req: ServerRequest, query: Map<string, string>) => void) {
         let newRoute = new Route(route, handler);
         this.routes.push(newRoute)
     }
