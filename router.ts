@@ -16,7 +16,7 @@ export class Route {
                 let c = path[i];
                 if(c === "/") {
                     // collapse all slashes into the last one used by checking if a slash is the next on
-                    if(path[i +1] && path[i + 1] !== "/") {
+                    if(path[i + 1] && path[i + 1] !== "/") {
                         this.path_segments.push(currPathSegment);
                         currPathSegment = "";                    
                     }
@@ -128,6 +128,7 @@ export class Router {
                     // Find the indices of the slugs
                     let routeSlugs: string[] = []
                     let slugIndices: number[] = []
+
                     for(var i = 0; i < selectedRoute.path_segments.length; i++) {
                         let path = selectedRoute.path_segments[i];
                         if(path[0] === ":") {
@@ -136,7 +137,7 @@ export class Router {
                             slugIndices.push(i);
                         }
                     }
-                    for(var i = 0; i <= numParams; i++) {
+                    for(var i = 0; i < routeSlugs.length; i++) {
                         // args.push(requested.path_segments[slugIndices[i]])
                         let argKey = routeSlugs[i]
                         let argVal = requested.path_segments[slugIndices[i]]
