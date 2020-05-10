@@ -45,7 +45,8 @@ export class Router {
         this.route()
     }
     async route() {
-        console.log("Handling routes...")
+        console.log("🍦 tasty! 🍦")
+        console.log("Serving up some tasty routes")
         for await (const req of this.serve_instance) {
             let matched = false;
             
