@@ -1,6 +1,6 @@
 # 🍦 tasty! 🍦
 
-A simple routing framework for Deno for serving simple websites
+A simple routing framework for Deno for serving simple websites. Created specifically as part of building https://crunchskills.com/
 
 ## Features
 * Serve text endpoints
