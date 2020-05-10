@@ -36,6 +36,9 @@ test("Test that slug logic works as expected", async function (): Promise<void> 
     router.on('/noslasher', (req) => {
         req.respond({ body: `slasher2` })
     });
+    router.on('/dubleslasher', (req) => {
+        req.respond({ body: `slasher3` })
+    });
     router.on('/reversed/args/:e/:f', (req, query: Map<string, string>) => {
         let e = query.get("e");
         let f = query.get("f");
@@ -67,6 +70,9 @@ test("Test that slug logic works as expected", async function (): Promise<void> 
     assertEquals(await (await fetch("http://localhost:8000/slasher/")).text(), "slasher1")
     assertEquals(await (await fetch("http://localhost:8000/noslasher")).text(), "slasher2")
     assertEquals(await (await fetch("http://localhost:8000/noslasher/")).text(), "slasher2")
+    assertEquals(await (await fetch("http://localhost:8000/dubleslasher///")).text(), "slasher3")
+    assertEquals(await (await fetch("http://localhost:8000///dubleslasher")).text(), "slasher3")
+    assertEquals(await (await fetch("http://localhost:8000///dubleslasher///")).text(), "slasher3")
     assertEquals(await (await fetch("http://localhost:8000/params?test=hello&test2=234&a=c")).text(), "hello 234 c");
     assertEquals(await (await fetch("http://localhost:8000/params-two-question??a=2")).text(), "2");
     assertEquals(await (await fetch("http://localhost:8000/params/level?test=hello&test2=xc8)_^%^&a=1")).text(), "400 Bad Request");
