@@ -137,7 +137,7 @@ export class Router {
                             slugIndices.push(i);
                         }
                     }
-                    for(var i = 0; i <= routeSlugs.length; i++) {
+                    for(var i = 0; i < routeSlugs.length; i++) {
                         // args.push(requested.path_segments[slugIndices[i]])
                         let argKey = routeSlugs[i]
                         let argVal = requested.path_segments[slugIndices[i]]
