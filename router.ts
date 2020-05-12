@@ -13,21 +13,17 @@ export class Route {
         }
         let currPathSegment = "";
         for(var i = 0; i < path.length; i++) {
-            if(i > 0) {
                 let c = path[i];
                 if(c === "/") {
-                    if(currPathSegment.length < 1) {
-                        throw `Invalid path ${path}. Each path segment should be seperated by exactly one slash /`;
-                    }
-                    else {
+                    // collapse all slashes into the last one used by checking if a slash is the next on
+                    if(path[i + 1] && path[i + 1] !== "/") {
                         this.path_segments.push(currPathSegment);
-                        currPathSegment = "";
+                        currPathSegment = "";                    
                     }
                 }
                 else {
                     currPathSegment += c;
                 }
-            }
         }
         if(currPathSegment.length > 0) {
             this.path_segments.push(currPathSegment);
@@ -129,6 +125,7 @@ export class Router {
                     // Find the indices of the slugs
                     let routeSlugs: string[] = []
                     let slugIndices: number[] = []
+
                     for(var i = 0; i < selectedRoute.path_segments.length; i++) {
                         let path = selectedRoute.path_segments[i];
                         if(path[0] === ":") {
