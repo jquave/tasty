@@ -77,7 +77,6 @@ export class Router {
             if(possibleRoutesSorted.length > 0) {
                 let selectedRoute = possibleRoutesSorted[0];
                 matched = true
-                // selectedRoute.describe_handler();
 
                     if (selectedRoute.handler) {
                     if(selectedRoute.path.length === 1) {
