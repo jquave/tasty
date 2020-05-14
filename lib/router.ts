@@ -1,36 +1,6 @@
-import { ServerRequest, Server } from "../deps.ts";
-import { sanitizedPath } from './path_helpers.ts'
+import { ServerRequest, Server } from '../deps.ts';
+import { Route } from './route.ts';
 
-export class Route {
-    path: string
-    handler: any
-    path_segments: string[] = []
-    constructor(path: string, handler: any) {
-        this.path = path
-        this.handler = handler
-        if(path[0] !== '/') {
-            throw `Invalid path ${path}. Paths should begin with a slash /`;
-        }
-        let currPathSegment = "";
-        for(var i = 0; i < path.length; i++) {
-                let c = path[i];
-                if(c === "/") {
-                    // collapse all slashes into the last one used by checking if a slash is the next on
-                    if(path[i + 1] && path[i + 1] !== "/") {
-                        this.path_segments.push(currPathSegment);
-                        currPathSegment = "";                    
-                    }
-                }
-                else {
-                    currPathSegment += c;
-                }
-        }
-        if(currPathSegment.length > 0) {
-            this.path_segments.push(currPathSegment);
-            currPathSegment = "";
-        }
-    }
-}
 export class Router {
     serve_instance: any;
     routes: Route[] = [];
@@ -50,7 +20,7 @@ export class Router {
             let requested = new Route(request[0], null)
             // Only match against routes with the same number of segments
             let routsWithSameCountOfSegments = this.routes.filter((route) => {
-                return route.path_segments.length === requested.path_segments.length
+                return route.pathSegments.length === requested.path_segments.length
             })
             // Further filter my routes with exact matches or potential matches from slugs
             let possibleRoutes: Route[] = []
