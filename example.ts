@@ -1,5 +1,5 @@
-import { serve, Server } from "https://deno.land/std@v0.42.0/http/server.ts";
-import { tasty } from 'https://raw.githubusercontent.com/jquave/tasty/master/tasty.ts';
+import { serve, Server } from "./deps.ts";
+import { tasty } from './tasty.ts';
 
 const s: Server = serve({ port: 8000 });
 

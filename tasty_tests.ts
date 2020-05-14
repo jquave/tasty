@@ -1,12 +1,12 @@
 import { tasty } from './tasty.ts';
-import { serve, ServerRequest, Server } from "https://deno.land/std@v0.42.0/http/server.ts";
+import { serve, ServerRequest, Server } from "./deps.ts";
 import {
     assert,
     assertEquals,
     assertMatch,
     assertStrContains,
     assertThrowsAsync,
-  } from "https://deno.land/std@v0.42.0/testing/asserts.ts";
+  } from "./test_deps.ts";
 const { Buffer, test } = Deno;
 
 

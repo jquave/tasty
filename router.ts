@@ -1,4 +1,4 @@
-import { ServerRequest, Server } from "https://deno.land/std@v0.42.0/http/server.ts";
+import { ServerRequest, Server } from "./deps.ts";
 import { sanitizedPath } from './path_helpers.ts'
 
 export class Route {
