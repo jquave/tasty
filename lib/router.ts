@@ -1,4 +1,4 @@
-import { ServerRequest, Server } from "./deps.ts";
+import { ServerRequest, Server } from "../deps.ts";
 import { sanitizedPath } from './path_helpers.ts'
 
 export class Route {

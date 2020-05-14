@@ -1,5 +1,5 @@
-import { tasty } from './tasty.ts';
-import { serve, ServerRequest, Server } from "./deps.ts";
+import { tasty } from '../tasty.ts';
+import { serve, ServerRequest, Server } from "../deps.ts";
 import {
     assert,
     assertEquals,
