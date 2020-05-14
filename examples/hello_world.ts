@@ -1,5 +1,5 @@
-import { serve, Server } from "./deps.ts";
-import { tasty } from './tasty.ts';
+import { serve, Server } from "../deps.ts";
+import { tasty } from '../tasty.ts';
 
 const s: Server = serve({ port: 8000 });
 
