@@ -7,16 +7,12 @@ let router = new tasty.Router();
 
 // Serve a static endpoint
 router.get('/',
-    (request: ServerRequest) => {
-        request.respond({ body: `Hello World!` })
-    }
+    (request: ServerRequest) => request.respond({ body: `Hello World!` })
 );
 
 // Serve a dynamic permalink
 router.get('/:name', 
-    (request: ServerRequest, query) => {
-        request.respond({ body: `Hello ${query.get("name")}` })
-    }
+    (request: ServerRequest, query) => request.respond({ body: `Hello ${query.get("name")}` })
 );
 
 console.log("🍦 tasty! 🍦")
