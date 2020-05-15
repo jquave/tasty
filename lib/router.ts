@@ -1,22 +1,18 @@
-import { ServerRequest, Server } from '../deps.ts';
+import { ServerRequest } from '../deps.ts';
 import { Route, Handler } from './route.ts';
 
 export class Router {
-    serve_instance: any;
     routes: Route[] = [];
-    handle404: any
-    constructor(serve_instance: Server) {
-        this.serve_instance = serve_instance;
-        this.handle404 = this.handle404default
-        this.route()
+    handle404: any;
+
+    constructor() {
+        this.handle404 = this.handle404default;
     }
-    async route() {
-        console.log("🍦 tasty! 🍦")
-        console.log("Serving up some tasty routes")
-        for await (const req of this.serve_instance) {
+
+    async route(request: ServerRequest) {
             let matched = false;
             //split the requested url on ? and remove all empty spaces resulting from several ?s
-            const [ path, queryParams ] = req.url.split("?").filter((word: string) => word.length > 0)
+            const [ path, queryParams ] = request.url.split("?").filter((word: string) => word.length > 0)
             let requested = new Route(path);
             // Only match against routes with the same number of segments
             let routsWithSameCountOfSegments = this.routes.filter((route) => {
@@ -80,7 +76,7 @@ export class Router {
 
                     if (selectedRoute.handler) {
                     if(selectedRoute.path.length === 1) {
-                        selectedRoute.handler(req);
+                        selectedRoute.handler(request, new Map<string, string>(), new URLSearchParams());
                     }
                     else {
                         let argsMap: Map<string, string> = new Map();
@@ -89,8 +85,8 @@ export class Router {
                             urlParams = new URLSearchParams(queryParams);
                         } catch {
                             console.log(`Bad request ${queryParams}`);
-                            req.respond({ body: `400 Bad Request` });
-                            continue;
+                            request.respond({ body: `400 Bad Request` });
+                            return;
                         }
                         // Find the indices of the slugs
                         let routeSlugs: string[] = []
@@ -111,15 +107,14 @@ export class Router {
                             console.log(`set ${argKey} to ${argVal}`)
                             argsMap.set(argKey, argVal);
                         }
-                        selectedRoute.handler(req, argsMap,urlParams);
+                        selectedRoute.handler(request, argsMap, urlParams);
                     }
                 }
             } else {
                 // Handle 404 when no match occurs
-                console.log(`404: ${req.url}`)
-                this.handle404(req)
+                console.log(`404: ${request.url}`)
+                this.handle404(request)
             }
-        }
     }
     404(handler: any) {
         this.handle404 = handler

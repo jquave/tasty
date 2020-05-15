@@ -2,8 +2,8 @@ import { ServerRequest } from '../deps.ts';
 
 export type Handler = (
   req: ServerRequest,
-  query?: Map<string, string>,
-  params?: URLSearchParams
+  query: Map<string, string>,
+  params: URLSearchParams
 ) => void;
 
 export class Route {
