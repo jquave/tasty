@@ -1,5 +1,10 @@
 import { ServerRequest } from '../deps.ts';
-import { Route, Handler } from './route.ts';
+import { Route, RouteHandler } from './route.ts';
+
+type RouteConfig = {
+    method: string,
+    path: string
+};
 
 export class Router {
     table: Map<string, Route[]> = new Map<string, Route[]>();
@@ -124,12 +129,9 @@ export class Router {
     handle404default(request: ServerRequest) {
         request.respond({ body: `404 Not Found` })
     }
-    on(config: {
-            method: string,
-            path: string,
-            handler: Handler
-    }) {
-        let route = new Route(config.path, config.handler);
+
+    on(config: RouteConfig, handler: RouteHandler) {
+        let route = new Route(config.path, handler);
         const method = config.method.toUpperCase();
 
         const routes = this.table.get(method) ?? [];
