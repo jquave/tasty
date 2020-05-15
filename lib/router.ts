@@ -14,7 +14,7 @@ export class Router {
         this.handle404 = this.handle404default;
     }
 
-    async route(request: ServerRequest) {
+    public async route(request: ServerRequest) {
             let matched = false;
             //split the requested url on ? and remove all empty spaces resulting from several ?s
             const [ path, queryParams ] = request.url.split("?").filter((word: string) => word.length > 0)
@@ -123,18 +123,34 @@ export class Router {
                 this.handle404(request)
             }
     }
-    404(handler: any) {
+    
+    public 404(handler: any) {
         this.handle404 = handler
     }
-    handle404default(request: ServerRequest) {
+
+    private handle404default(request: ServerRequest) {
         request.respond({ body: `404 Not Found` })
     }
 
-    on(config: RouteConfig, handler: RouteHandler) {
+    private on(config: RouteConfig, handler: RouteHandler) {
         let route = new Route(config.path, handler);
         const method = config.method.toUpperCase();
 
         const routes = this.table.get(method) ?? [];
         this.table.set(method, [ ...routes, route ]);
+    }
+
+    public get(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'get',
+            path
+        }, handler);
+    }
+
+    public post(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'post',
+            path
+        }, handler);
     }
 }
