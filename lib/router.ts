@@ -1,53 +1,19 @@
-import { ServerRequest, Server } from "../deps.ts";
-import { sanitizedPath } from './path_helpers.ts'
+import { ServerRequest } from '../deps.ts';
+import { Route, Handler } from './route.ts';
 
-export class Route {
-    path: string
-    handler: any
-    path_segments: string[] = []
-    constructor(path: string, handler: any) {
-        this.path = path
-        this.handler = handler
-        if(path[0] !== '/') {
-            throw `Invalid path ${path}. Paths should begin with a slash /`;
-        }
-        let currPathSegment = "";
-        for(var i = 0; i < path.length; i++) {
-                let c = path[i];
-                if(c === "/") {
-                    // collapse all slashes into the last one used by checking if a slash is the next on
-                    if(path[i + 1] && path[i + 1] !== "/") {
-                        this.path_segments.push(currPathSegment);
-                        currPathSegment = "";                    
-                    }
-                }
-                else {
-                    currPathSegment += c;
-                }
-        }
-        if(currPathSegment.length > 0) {
-            this.path_segments.push(currPathSegment);
-            currPathSegment = "";
-        }
-    }
-}
 export class Router {
-    serve_instance: any;
     routes: Route[] = [];
-    handle404: any
-    constructor(serve_instance: Server) {
-        this.serve_instance = serve_instance;
-        this.handle404 = this.handle404default
-        this.route()
+    handle404: any;
+
+    constructor() {
+        this.handle404 = this.handle404default;
     }
-    async route() {
-        console.log("🍦 tasty! 🍦")
-        console.log("Serving up some tasty routes")
-        for await (const req of this.serve_instance) {
+
+    async route(request: ServerRequest) {
             let matched = false;
             //split the requested url on ? and remove all empty spaces resulting from several ?s
-            const request = req.url.split("?").filter((word: string) => word.length > 0)
-            let requested = new Route(request[0], null)
+            const [ path, queryParams ] = request.url.split("?").filter((word: string) => word.length > 0)
+            let requested = new Route(path);
             // Only match against routes with the same number of segments
             let routsWithSameCountOfSegments = this.routes.filter((route) => {
                 return route.path_segments.length === requested.path_segments.length
@@ -107,49 +73,48 @@ export class Router {
             if(possibleRoutesSorted.length > 0) {
                 let selectedRoute = possibleRoutesSorted[0];
                 matched = true
-                // selectedRoute.describe_handler();
 
-                if(selectedRoute.handler.length == 1) {
-                    selectedRoute.handler(req);
-                }
-                else {
-                    let argsMap: Map<string, string> = new Map();
-                    let urlParams;
-                    try { // exception handling for malformed URL
-                        urlParams = new URLSearchParams(request[1]);
-                    } catch {
-                        console.log(`Bad request ${request[1]}`);
-                        req.respond({ body: `400 Bad Request` });
-                        continue;
+                    if (selectedRoute.handler) {
+                    if(selectedRoute.path.length === 1) {
+                        selectedRoute.handler(request, new Map<string, string>(), new URLSearchParams());
                     }
-                    // Find the indices of the slugs
-                    let routeSlugs: string[] = []
-                    let slugIndices: number[] = []
-
-                    for(var i = 0; i < selectedRoute.path_segments.length; i++) {
-                        let path = selectedRoute.path_segments[i];
-                        if(path[0] === ":") {
-                            const sslug = path.substring(1, path.length);
-                            routeSlugs.push(sslug);
-                            slugIndices.push(i);
+                    else {
+                        let argsMap: Map<string, string> = new Map();
+                        let urlParams;
+                        try { // exception handling for malformed URL
+                            urlParams = new URLSearchParams(queryParams);
+                        } catch {
+                            console.log(`Bad request ${queryParams}`);
+                            request.respond({ body: `400 Bad Request` });
+                            return;
                         }
+                        // Find the indices of the slugs
+                        let routeSlugs: string[] = []
+                        let slugIndices: number[] = []
+
+                        for(var i = 0; i < selectedRoute.path_segments.length; i++) {
+                            let path = selectedRoute.path_segments[i];
+                            if(path[0] === ":") {
+                                const sslug = path.substring(1, path.length);
+                                routeSlugs.push(sslug);
+                                slugIndices.push(i);
+                            }
+                        }
+                        for(var i = 0; i < routeSlugs.length; i++) {
+                            // args.push(requested.path_segments[slugIndices[i]])
+                            let argKey = routeSlugs[i]
+                            let argVal = requested.path_segments[slugIndices[i]]
+                            console.log(`set ${argKey} to ${argVal}`)
+                            argsMap.set(argKey, argVal);
+                        }
+                        selectedRoute.handler(request, argsMap, urlParams);
                     }
-                    for(var i = 0; i < routeSlugs.length; i++) {
-                        // args.push(requested.path_segments[slugIndices[i]])
-                        let argKey = routeSlugs[i]
-                        let argVal = requested.path_segments[slugIndices[i]]
-                        console.log(`set ${argKey} to ${argVal}`)
-                        argsMap.set(argKey, argVal);
-                    }
-                    selectedRoute.handler(req, argsMap,urlParams);
                 }
-            }
-            if(!matched) {
+            } else {
                 // Handle 404 when no match occurs
-                console.log(`404: ${req.url}`)
-                this.handle404(req)
+                console.log(`404: ${request.url}`)
+                this.handle404(request)
             }
-        }
     }
     404(handler: any) {
         this.handle404 = handler
@@ -158,11 +123,7 @@ export class Router {
         req.respond({ body: `404 Not Found` })
     }
     on(route: string, 
-        handler: (
-            req: ServerRequest,
-            query: Map<string, string>,
-            params: URLSearchParams
-        ) => void)  {
+        handler: Handler)  {
         let newRoute = new Route(route, handler);
         this.routes.push(newRoute)
     }

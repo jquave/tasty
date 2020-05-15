@@ -14,27 +14,29 @@ A simple routing framework for Deno for serving simple websites. Created specifi
 #### web.ts:
 
 ```
-import { serve, Server } from "https://deno.land/std@v0.42.0/http/server.ts";
+import { serve, Server } from "https://deno.land/std/http/server.ts";
 import { tasty } from 'https://raw.githubusercontent.com/jquave/tasty/master/tasty.ts';
 
 const s: Server = serve({ port: 8000 });
 
-let router = new tasty.Router(s);
+let router = new tasty.Router();
 
 // Serve a static endpoint
-router.on('/', (req) => {
-    req.respond({ body: `Hello World!` })
+router.on('/', (request: ServerRequest) => {
+    request.respond({ body: `Hello World!` })
 });
 
 // Serve a dynamic permalink
-router.on('/:name', (req, query) => {
-    req.respond({ body: `Hello ${query.get("name")}` })
+router.on('/:name', (request: ServerRequest, query) => {
+    request.respond({ body: `Hello ${query.get("name")}` })
 });
 
-// Get params by name
-router.on('/form', (req, query, params) => {
-    req.respond({ body: `"name" given in params is ${params.get("name")}` })
-});
+console.log("🍦 tasty! 🍦")
+console.log("Serving up some tasty routes")
+
+for await (const request of s) {
+    router.route(request);
+}
 ```
 
 Run with

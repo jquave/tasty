@@ -1,5 +1,6 @@
 // Copyright 2002 Jameson Quave MIT License
-import { Route, Router } from "./lib/router.ts"
+import { Router } from './lib/router.ts';
+import { Route } from './lib/route.ts';
 
 export const tasty = {
     Route,
