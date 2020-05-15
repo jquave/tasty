@@ -2,7 +2,7 @@ import { ServerRequest } from '../deps.ts';
 import { Route, Handler } from './route.ts';
 
 export class Router {
-    routes: Route[] = [];
+    table: Map<string, Route[]> = new Map<string, Route[]>();
     handle404: any;
 
     constructor() {
@@ -15,9 +15,11 @@ export class Router {
             const [ path, queryParams ] = request.url.split("?").filter((word: string) => word.length > 0)
             let requested = new Route(path);
             // Only match against routes with the same number of segments
-            let routsWithSameCountOfSegments = this.routes.filter((route) => {
+            const routes = this.table.get(request.method) ?? [];
+            let routsWithSameCountOfSegments = routes.filter((route) => {
                 return route.path_segments.length === requested.path_segments.length
             })
+
             // Further filter my routes with exact matches or potential matches from slugs
             let possibleRoutes: Route[] = []
             for(let rdx in routsWithSameCountOfSegments) {
@@ -119,13 +121,18 @@ export class Router {
     404(handler: any) {
         this.handle404 = handler
     }
-    handle404default(req: ServerRequest) {
-        req.respond({ body: `404 Not Found` })
+    handle404default(request: ServerRequest) {
+        request.respond({ body: `404 Not Found` })
     }
-    on(route: string, 
-        handler: Handler)  {
-        let newRoute = new Route(route, handler);
-        this.routes.push(newRoute)
+    on(config: {
+            method: string,
+            path: string,
+            handler: Handler
+    }) {
+        let route = new Route(config.path, config.handler);
+        const method = config.method.toUpperCase();
+
+        const routes = this.table.get(method) ?? [];
+        this.table.set(method, [ ...routes, route ]);
     }
-    //AsyncIterableIterator<ServerRequest>
 }

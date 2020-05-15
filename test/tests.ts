@@ -15,59 +15,122 @@ test("Test that slug logic works as expected", async function (): Promise<void> 
     const s: Server = serve({ port: 8000 });
     let router = new tasty.Router();
     
-    router.on('/ae/', (req) => {
-        req.respond({ body: `/a` })
-    });
-    router.on('/ae/:be', (req, query) => {
-        req.respond({ body: `/a2/${query.get('be')}` })
-    });
-    router.on('/ae/:be/:ce', (req, query) => {
-        req.respond({ body: `/a3/${query.get('be')}/${query.get('ce')}` })
-    });
-    router.on('/ae/be/:ce', (req, query) => {
-        req.respond({ body: `/a/b/${query.get('ce')}` })
-    });
-    router.on('/ae/be/:cf', (req, query) => {
-        req.respond({ body: `don't trigger me /a/b/${query.get('cf')}` })
+    router.on({
+        method: 'get',
+        path: '/ae/', 
+        handler: (req) => {
+            req.respond({ body: `/a` })
+        }
     });
 
-    router.on('/slasher/', (req) => {
-        req.respond({ body: `slasher1` })
-    });
-    router.on('/noslasher', (req) => {
-        req.respond({ body: `slasher2` })
-    });
-    router.on('/dubleslasher', (req) => {
-        req.respond({ body: `slasher3` })
-    });
-    router.on('/reversed/args/:e/:f', (req, query: Map<string, string>) => {
-        let e = query.get("e");
-        let f = query.get("f");
-        req.respond({ body: `${e} ${f}` })
-    });
-    router.on("/params", (req, query: Map<string, string>, params) => {
-        req.respond({
-            body: `${params.get("test")} ${params.get("test2")} ${params.get("a")}`,
-        });
+    router.on({
+        method: 'get',
+        path: '/ae/:be',
+        handler: (req, query) => {
+            req.respond({ body: `/a2/${query.get('be')}` })
+        }
     });
 
-    router.on("/params/level", (req, query: Map<string, string>, params) => {
-        req.respond({
-            body: `${params.get("test")} ${params.get("test2")} ${params.get("a")}`,
-        });
+    router.on({
+        method: 'get',
+        path: '/ae/:be/:ce',
+        handler: (req, query) => {
+            req.respond({ body: `/a3/${query.get('be')}/${query.get('ce')}` })
+        }
     });
-    router.on(
-        "/params-two-question",
-        (req, query: Map<string, string>, params) => {
+
+    router.on({
+        method: 'get',
+        path: '/ae/be/:ce',
+        handler: (req, query) => {
+            req.respond({ body: `/a/b/${query.get('ce')}` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/ae/be/:cf',
+        handler: (req, query) => {
+            req.respond({ body: `don't trigger me /a/b/${query.get('cf')}` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/slasher/',
+        handler: (req) => {
+            req.respond({ body: `slasher1` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/noslasher',
+        handler: (req) => {
+            req.respond({ body: `slasher2` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/dubleslasher',
+        handler: (req) => {
+            req.respond({ body: `slasher3` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/reversed/args/:e/:f', 
+        handler: (req, query: Map<string, string>) => {
+            let e = query.get("e");
+            let f = query.get("f");
+            req.respond({ body: `${e} ${f}` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/params', 
+        handler: (req, query: Map<string, string>, params) => {
+            req.respond({
+                body: `${params.get("test")} ${params.get("test2")} ${params.get("a")}`,
+            });
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/params/level', 
+        handler: (req, query: Map<string, string>, params) => {
+            req.respond({
+                body: `${params.get("test")} ${params.get("test2")} ${params.get("a")}`,
+            });
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/params-two-question',
+        handler: (req, query: Map<string, string>, params) => {
             req.respond({body: `${params.get("a")}`,});
         }
-    );
-    
-    router.on('/1/:2/:3/:4/:5', (req, query) => {
-        req.respond({ body: `1${query.get('2')}${query.get('3')}${query.get('4')}${query.get('5')}` })
     });
-    router.on('/1/2/3/4/5/:6', (req, query) => {
-        req.respond({ body: `12345${query.get('6')}` })
+    
+    router.on({
+        method: 'get',
+        path: '/1/:2/:3/:4/:5', 
+        handler: (req, query) => {
+            req.respond({ body: `1${query.get('2')}${query.get('3')}${query.get('4')}${query.get('5')}` })
+        }
+    });
+
+    router.on({
+        method: 'get',
+        path: '/1/2/3/4/5/:6', 
+        handler: (req, query) => {
+            req.respond({ body: `12345${query.get('6')}` })
+        }
     });
 
     const init = async () => {
