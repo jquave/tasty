@@ -30,6 +30,11 @@ router.on('/', (req) => {
 router.on('/:name', (req, query) => {
     req.respond({ body: `Hello ${query.get("name")}` })
 });
+
+// Get params by name
+router.on('/form', (req, query, params) => {
+    req.respond({ body: `"name" given in params is ${params.get("name")}` })
+});
 ```
 
 Run with
