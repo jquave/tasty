@@ -1,6 +1,6 @@
 import { ServerRequest } from '../deps.ts';
 
-export type Handler = (
+export type RouteHandler = (
   req: ServerRequest,
   query: Map<string, string>,
   params: URLSearchParams
@@ -8,9 +8,9 @@ export type Handler = (
 
 export class Route {
   path: string;
-  handler?: Handler;
+  handler?: RouteHandler;
   path_segments: string[] = []
-  constructor(path: string, handler?: Handler) {
+  constructor(path: string, handler?: RouteHandler) {
       this.path = path
       this.handler = handler
 
