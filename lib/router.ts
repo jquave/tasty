@@ -147,9 +147,58 @@ export class Router {
         }, handler);
     }
 
+    public head(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'head',
+            path
+        }, handler);
+    }
+
     public post(path: string, handler: RouteHandler) {
         this.on({
             method: 'post',
+            path
+        }, handler);
+    }
+    
+    public put(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'put',
+            path
+        }, handler);
+    }
+
+    public delete(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'delete',
+            path
+        }, handler);
+    }
+
+    public connect(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'connect',
+            path
+        }, handler);
+    }
+
+    public options(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'options',
+            path
+        }, handler);
+    }
+
+    public trace(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'trace',
+            path
+        }, handler);
+    }
+
+    public patch(path: string, handler: RouteHandler) {
+        this.on({
+            method: 'patch',
             path
         }, handler);
     }
