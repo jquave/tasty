@@ -14,7 +14,7 @@ A simple routing framework for Deno for serving simple websites. Created specifi
 #### web.ts:
 
 ```
-import { serve, Server } from "https://deno.land/std/http/server.ts";
+import { serve, Server, ServerRequest } from "https://deno.land/std/http/server.ts";
 import { tasty } from 'https://raw.githubusercontent.com/jquave/tasty/master/tasty.ts';
 
 const s: Server = serve({ port: 8000 });
