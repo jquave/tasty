@@ -21,14 +21,14 @@ export class Router {
             let requested = new Route(path);
             // Only match against routes with the same number of segments
             const routes = this.table.get(request.method) ?? [];
-            let routsWithSameCountOfSegments = routes.filter((route) => {
+            let routesWithSameCountOfSegments = routes.filter((route) => {
                 return route.path_segments.length === requested.path_segments.length
             })
 
             // Further filter my routes with exact matches or potential matches from slugs
             let possibleRoutes: Route[] = []
-            for(let rdx in routsWithSameCountOfSegments) {
-                let route = routsWithSameCountOfSegments[rdx];
+            for(let rdx in routesWithSameCountOfSegments) {
+                let route = routesWithSameCountOfSegments[rdx];
                 let routeDisqualified = false
                 let wildcard_count = 0;
                 let first_wildcard = -1;
