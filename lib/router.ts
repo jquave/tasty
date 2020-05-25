@@ -8,11 +8,9 @@ type RouteConfig = {
 
 export class Router {
     table: Map<string, Route[]> = new Map<string, Route[]>();
-    handle404: any;
+    handle404: RouteHandler = (request: ServerRequest) => request.respond({ body: `404 Not Found` });
 
-    constructor() {
-        this.handle404 = this.handle404default;
-    }
+    constructor() { }
 
     public async route(request: ServerRequest) {
             let matched = false;
@@ -120,16 +118,12 @@ export class Router {
             } else {
                 // Handle 404 when no match occurs
                 console.log(`404: ${request.url}`)
-                this.handle404(request)
+                this.handle404(request, new Map<string, string>(), new URLSearchParams());
             }
     }
     
     public 404(handler: any) {
         this.handle404 = handler
-    }
-
-    private handle404default(request: ServerRequest) {
-        request.respond({ body: `404 Not Found` })
     }
 
     private on(config: RouteConfig, handler: RouteHandler) {
